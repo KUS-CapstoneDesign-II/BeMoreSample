@@ -120,3 +120,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* BeMore mock styles */
+.badge { @apply inline-block bg-black/50 text-white px-1 py-0.5 rounded; }
+@media print {
+  .no-print { display:none; }
+}
