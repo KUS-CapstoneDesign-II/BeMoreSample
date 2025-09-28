@@ -1,9 +1,9 @@
 "use client";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 
-export default function LoadingReport() {
+function LoadingBody() {
   const sp = useSearchParams();
   const router = useRouter();
   const sid = sp.get("sid");
@@ -23,5 +23,13 @@ export default function LoadingReport() {
         </div>
       </Card>
     </div>
+  );
+}
+
+export default function LoadingReport() {
+  return (
+    <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">분석 중…</div>}>
+      <LoadingBody />
+    </Suspense>
   );
 }

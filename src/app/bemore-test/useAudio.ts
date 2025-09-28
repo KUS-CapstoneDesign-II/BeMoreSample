@@ -4,6 +4,8 @@ import { RingBuffer, clamp, ema, variance } from "./vad";
 
 type Permission = "pending" | "granted" | "denied";
 
+type F32 = Float32Array & { buffer: ArrayBuffer };
+
 export type AudioState = {
   permission: Permission;
   noiseMode: boolean;
@@ -26,15 +28,16 @@ export function useAudio(windowMs = 10000): AudioState {
   const ctxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
-  const dataRef = useRef<Float32Array | null>(null);
+  const dataRef = useRef<F32 | null>(null);
   const rmsRB = useRef(new RingBuffer(500));
   const pitchRB = useRef(new RingBuffer(500));
   const arousalEmaRef = useRef<number | undefined>(undefined);
 
   const sample = useCallback((now: number) => {
     if (!analyserRef.current || !dataRef.current) return;
-    analyserRef.current.getFloatTimeDomainData(dataRef.current);
-    const buf = dataRef.current;
+    // TS lib signature mismatch across environments; safe at runtime
+    (analyserRef.current as any).getFloatTimeDomainData(dataRef.current as any);
+    const buf = dataRef.current as Float32Array;
     // RMS
     let s = 0;
     for (let i = 0; i < buf.length; i++) s += buf[i] * buf[i];
@@ -93,7 +96,7 @@ export function useAudio(windowMs = 10000): AudioState {
       const src = ctx.createMediaStreamSource(stream);
       src.connect(analyser);
       ctxRef.current = ctx; analyserRef.current = analyser; sourceRef.current = src;
-      dataRef.current = new Float32Array(analyser.fftSize);
+      dataRef.current = new Float32Array(analyser.fftSize) as F32;
       setPermission("granted"); setNoiseMode(false);
       if (!rafRef.current) rafRef.current = requestAnimationFrame(loop);
     } catch (e) {

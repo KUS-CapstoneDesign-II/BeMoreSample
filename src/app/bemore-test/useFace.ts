@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { clamp, ema } from "./vad";
 
 type Permission = "pending" | "granted" | "denied";
@@ -33,9 +33,10 @@ export function useFace() {
       }
       setPermission("granted");
       setNoiseMode(false);
-      // Load MediaPipe tasks-vision bundle and model
+      // Load MediaPipe tasks-vision via runtime import to avoid build-time module resolution
       try {
-        const vision = (await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs")) as any;
+        const dynImport = (0, eval)("import");
+        const vision: any = await dynImport("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs");
         const fileset = await vision.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
         faceLandmarkerRef.current = await vision.FaceLandmarker.createFromOptions(fileset, {
           baseOptions: {

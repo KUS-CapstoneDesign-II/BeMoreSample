@@ -100,9 +100,9 @@ export function Scatter3D({ points, bg = "#0b0b0b", height = 200, ariaLabel = "3
       [0,0,0],[1,0,0],[1,1,0],[0,1,0],
       [0,0,1],[1,0,1],[1,1,1],[0,1,1]
     ];
-    const E = ([a,b]:[number,number])=>{ const va = project(...verts[a]); const vb = project(...verts[b]); ctx.beginPath(); ctx.moveTo(va.x,va.y); ctx.lineTo(vb.x,vb.y); ctx.stroke(); };
     ctx.strokeStyle = "#1f2937"; ctx.lineWidth = 1;
-    [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(E);
+    const edges: [number, number][] = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+    for (const [a,b] of edges) { const va = project(...verts[a]); const vb = project(...verts[b]); ctx.beginPath(); ctx.moveTo(va.x,va.y); ctx.lineTo(vb.x,vb.y); ctx.stroke(); }
 
     // axes
     const o = project(0,0,0); const vx = project(1,0,0); const vy = project(0,1,0); const vz = project(0,0,1);
