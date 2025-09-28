@@ -136,6 +136,22 @@ export default function Page() {
       <header className="space-y-1">
         <h1 className="text-xl font-semibold">BeMore — 따뜻한 감정 상담 (Mock)</h1>
         <p className="text-sm text-muted-foreground">말과 표정/목소리를 가볍게 살펴, 지금의 감정 좌표(V/A/D)를 이해해요.</p>
+        <div className="pt-2">
+          <Button size="sm" variant="outline" onClick={()=>{
+            const sid = id();
+            const sess = {
+              id: sid,
+              createdAt: Date.now(),
+              turns: turns.map(t=>({ id: t.id, speaker: t.speaker, text: t.text, t: t.t, vad: t.vad })),
+              vadTimeline: vadRB.current.toArray().map(p=>({ t: p.t, v: p.v, a: arousal, d: (latestUserTurnAt(p.t)?.vad?.d) ?? vadNow.d })),
+              tipsUsed: currentTip ? [{ id: id(), bucket: currentTip.bucket, insight: currentTip.insight, action: currentTip.action, t: Date.now() }] : [],
+              bookmarks: bookmarks,
+              notes: note,
+            } as any;
+            upsertSession(sess);
+            window.location.assign(`/report/loading?sid=${sid}`);
+          }}>상담 종료</Button>
+        </div>
       </header>
 
       {/* 노이즈 모드 상단 알림 비표시 */}
