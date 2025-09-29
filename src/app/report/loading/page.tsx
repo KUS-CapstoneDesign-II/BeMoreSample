@@ -10,7 +10,7 @@ function LoadingBody() {
   useEffect(() => {
     const t = setTimeout(() => {
       if (sid) router.replace(`/report/${sid}`);
-      else router.replace("/onboarding");
+      else router.replace("/home");
     }, 1600);
     return () => clearTimeout(t);
   }, [sid, router]);

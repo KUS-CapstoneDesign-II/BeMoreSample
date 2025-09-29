@@ -2,10 +2,11 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function RootRedirect() {
   const router = useRouter();
   useEffect(() => {
-    router.replace("/onboarding");
+    // After onboarding users land on platform home
+    router.replace("/home");
   }, [router]);
   return null;
 }

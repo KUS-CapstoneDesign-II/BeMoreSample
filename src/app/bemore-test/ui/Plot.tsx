@@ -62,7 +62,7 @@ export function Scatter({ points, color = "#60a5fa", bg = "#0b0b0b", size = 3, h
 }
 
 // Interactive isometric-like 3D with adjustable rotation angles (deg)
-export function Scatter3D({ points, bg = "#0b0b0b", height = 200, ariaLabel = "3d scatter", rotZDeg = 45, rotXDeg = 35.264, interactive = true, initialRotZDeg = rotZDeg, initialRotXDeg = rotXDeg, onAnglesChange }: { points: { x:number; y:number; z:number }[]; bg?: string; height?: number; ariaLabel?: string; rotZDeg?: number; rotXDeg?: number; interactive?: boolean; initialRotZDeg?: number; initialRotXDeg?: number; onAnglesChange?: (zDeg:number,xDeg:number)=>void }) {
+export function Scatter3D({ points, bg = "#0b0b0b", height = 200, ariaLabel = "3d scatter", rotZDeg = 45, rotXDeg = 35.264, interactive = true, initialRotZDeg = rotZDeg, initialRotXDeg = rotXDeg, onAnglesChange, connect = false, lineColor = "#94a3b8", lineWidth = 1.5, quality = "fast", maxPoints = 800 }: { points: { x:number; y:number; z:number }[]; bg?: string; height?: number; ariaLabel?: string; rotZDeg?: number; rotXDeg?: number; interactive?: boolean; initialRotZDeg?: number; initialRotXDeg?: number; onAnglesChange?: (zDeg:number,xDeg:number)=>void; connect?: boolean; lineColor?: string; lineWidth?: number; quality?: "fast" | "high"; maxPoints?: number }) {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const zRef = useRef<number>(initialRotZDeg);
   const xRef = useRef<number>(initialRotXDeg);
@@ -110,18 +110,44 @@ export function Scatter3D({ points, bg = "#0b0b0b", height = 200, ariaLabel = "3
     ctx.strokeStyle = "#ef4444"; ctx.beginPath(); ctx.moveTo(o.x,o.y); ctx.lineTo(vx.x,vx.y); ctx.stroke();
     ctx.strokeStyle = "#22c55e"; ctx.beginPath(); ctx.moveTo(o.x,o.y); ctx.lineTo(vy.x,vy.y); ctx.stroke();
     ctx.strokeStyle = "#3b82f6"; ctx.beginPath(); ctx.moveTo(o.x,o.y); ctx.lineTo(vz.x,vz.y); ctx.stroke();
-    ctx.fillStyle = "#cbd5e1"; ctx.font = "11px system-ui";
-    ctx.fillText("V", vx.x+4, vx.y); ctx.fillText("A", vy.x+4, vy.y); ctx.fillText("D", vz.x+4, vz.y);
-
-    // points
-    const sortedPts = [...points].sort((a,b)=> a.z-b.z);
-    for (const p of sortedPts) {
-      const pr = project(p.x,p.y,p.z);
-      const r = 2 + p.z*3; const col = `rgba(255,255,255,${0.6 + 0.4*p.z})`;
-      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(pr.x, pr.y, r, 0, Math.PI*2); ctx.fill();
+    if (quality === "high") {
+      ctx.fillStyle = "#cbd5e1"; ctx.font = "11px system-ui";
+      ctx.fillText("V", vx.x+4, vx.y); ctx.fillText("A", vy.x+4, vy.y); ctx.fillText("D", vz.x+4, vz.y);
     }
 
-    ctx.fillStyle = "#cbd5e1"; ctx.font = "11px system-ui"; ctx.fillText("V-A-D 3D — drag to rotate", 6, 14);
+    // optional polyline connecting points in provided order
+    if (connect && points.length > 1) {
+      ctx.strokeStyle = lineColor; ctx.lineWidth = lineWidth; ctx.beginPath();
+      const step = Math.max(1, Math.ceil(points.length / maxPoints));
+      for (let i = 0; i < points.length; i += step) {
+        const p = points[i];
+        const pr = project(p.x, p.y, p.z);
+        if (i === 0) ctx.moveTo(pr.x, pr.y); else ctx.lineTo(pr.x, pr.y);
+      }
+      ctx.stroke();
+    }
+
+    // points (decimated, no sorting in fast mode)
+    const stepPts = Math.max(1, Math.ceil(points.length / maxPoints));
+    if (quality === "high") {
+      const sortedPts = [...points].sort((a,b)=> a.z-b.z);
+      for (let i = 0; i < sortedPts.length; i += stepPts) {
+        const p = sortedPts[i];
+        const pr = project(p.x,p.y,p.z);
+        const r = 2 + p.z*3; const col = `rgba(255,255,255,${0.6 + 0.4*p.z})`;
+        ctx.fillStyle = col; ctx.beginPath(); ctx.arc(pr.x, pr.y, r, 0, Math.PI*2); ctx.fill();
+      }
+    } else {
+      ctx.fillStyle = "#ffffff";
+      for (let i = 0; i < points.length; i += stepPts) {
+        const p = points[i]; const pr = project(p.x,p.y,p.z);
+        ctx.beginPath(); ctx.arc(pr.x, pr.y, 2, 0, Math.PI*2); ctx.fill();
+      }
+    }
+
+    if (quality === "high") {
+      ctx.fillStyle = "#cbd5e1"; ctx.font = "11px system-ui"; ctx.fillText("V-A-D 3D — drag to rotate", 6, 14);
+    }
   };
 
   useEffect(()=>{ draw(); }, [points, bg, height]);
