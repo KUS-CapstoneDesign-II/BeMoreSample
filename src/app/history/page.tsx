@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getReminder, getDailyStreak, getWeeklyProgress, listSessions, setReminder, summarizeSession, upsertSession } from "@/app/bemore-test/store";
+import { getReminder, getDailyStreak, getWeeklyProgress, listSessions, setReminder, summarizeSession, upsertSession, toggleFavorite, setSessionTags } from "@/app/bemore-test/store";
 import { LinePlot, Scatter3D } from "@/app/bemore-test/ui/Plot";
 
 export default function HistoryPage() {
@@ -16,6 +16,8 @@ export default function HistoryPage() {
   const [tagFilter, setTagFilter] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"newest"|"oldest">("newest");
   const [cursorT, setCursorT] = useState<number | undefined>(undefined);
+  const [maxPoints3d, setMaxPoints3d] = useState<number>(600);
+  const [newTag, setNewTag] = useState<Record<string,string>>({});
   useEffect(() => {
     setMounted(true);
     setSessions(listSessions());
@@ -129,24 +131,24 @@ export default function HistoryPage() {
         <h1 className="text-lg font-semibold">종합 분석</h1>
         <div className="flex items-center gap-3">
           <a href="/bemore-test" className="text-xs rounded bg-primary text-primary-foreground px-3 py-2">오늘도 기록하기</a>
-          <label className="text-xs text-muted-foreground">범위</label>
-          <select className="text-xs rounded border bg-background px-2 py-1" value={range} onChange={e=>setRange(e.target.value as any)}>
+          <label htmlFor="rangeSel" className="text-xs text-muted-foreground">범위</label>
+          <select id="rangeSel" className="text-xs rounded border bg-background px-2 py-1" value={range} onChange={e=>setRange(e.target.value as any)}>
             <option value="7">7일</option>
             <option value="30">30일</option>
             <option value="all">전체</option>
           </select>
-          <label className="text-xs text-muted-foreground">정렬</label>
-          <select className="text-xs rounded border bg-background px-2 py-1" value={sortOrder} onChange={e=>setSortOrder(e.target.value as any)}>
+          <label htmlFor="sortSel" className="text-xs text-muted-foreground">정렬</label>
+          <select id="sortSel" className="text-xs rounded border bg-background px-2 py-1" value={sortOrder} onChange={e=>setSortOrder(e.target.value as any)}>
             <option value="newest">최신순</option>
             <option value="oldest">오래된순</option>
           </select>
-          <label className="text-xs text-muted-foreground">태그</label>
-          <input className="text-xs rounded border bg-background px-2 py-1 w-28" placeholder="예: 운동" value={tagFilter} onChange={e=>setTagFilter(e.target.value)} />
-          <label className="text-xs text-muted-foreground flex items-center gap-1">
-            <input type="checkbox" checked={onlyFavs} onChange={e=>setOnlyFavs(e.target.checked)} /> 즐겨찾기만
+          <label htmlFor="tagFilter" className="text-xs text-muted-foreground">태그</label>
+          <input id="tagFilter" className="text-xs rounded border bg-background px-2 py-1 w-28" placeholder="예: 운동" value={tagFilter} onChange={e=>setTagFilter(e.target.value)} />
+          <label htmlFor="onlyFavs" className="text-xs text-muted-foreground flex items-center gap-1">
+            <input id="onlyFavs" type="checkbox" checked={onlyFavs} onChange={e=>setOnlyFavs(e.target.checked)} /> 즐겨찾기만
           </label>
-          <label className="text-xs text-muted-foreground">3D 뷰</label>
-          <select className="text-xs rounded border bg-background px-2 py-1" value={view} onChange={e=>setView(e.target.value as any)}>
+          <label htmlFor="viewSel" className="text-xs text-muted-foreground">3D 뷰</label>
+          <select id="viewSel" className="text-xs rounded border bg-background px-2 py-1" value={view} onChange={e=>setView(e.target.value as any)}>
             <option value="iso">아이소</option>
             <option value="front">정면</option>
             <option value="top">탑</option>
@@ -217,6 +219,7 @@ export default function HistoryPage() {
             <div className="text-xs text-muted-foreground">리마인더 시간</div>
             <input
               type="time"
+              id="reminderTime"
               className="w-full rounded border bg-background px-3 py-2 text-sm"
               value={reminder.time}
               onChange={(e)=>setReminderState({ ...reminder, time: e.target.value })}
@@ -225,6 +228,7 @@ export default function HistoryPage() {
           <div className="space-y-1">
             <div className="text-xs text-muted-foreground">리마인더 메모</div>
             <input
+              id="reminderNote"
               className="w-full rounded border bg-background px-3 py-2 text-sm"
               placeholder="예: 저녁 식사 후 5분 기록"
               value={reminder.note ?? ""}
@@ -232,8 +236,8 @@ export default function HistoryPage() {
             />
           </div>
           <div className="md:col-span-2 flex items-center justify-between">
-            <label className="flex items-center gap-2 text-xs">
-              <input type="checkbox" checked={reminder.enabled} onChange={(e)=>setReminderState({ ...reminder, enabled: e.target.checked })} />
+            <label htmlFor="reminderEnabled" className="flex items-center gap-2 text-xs">
+              <input id="reminderEnabled" type="checkbox" checked={reminder.enabled} onChange={(e)=>setReminderState({ ...reminder, enabled: e.target.checked })} />
               <span>리마인더 사용</span>
             </label>
             <Button size="sm" onClick={()=>{ setReminder(reminder); }}>리마인더 저장</Button>
@@ -245,12 +249,15 @@ export default function HistoryPage() {
         <Card className="p-4 space-y-2">
           <div className="flex items-center justify-between">
             <div className="text-sm">3D 감정 좌표 (V-A-D)</div>
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-muted-foreground">품질</label>
-              <select className="text-xs rounded border bg-background px-2 py-1" value={quality3d} onChange={e=>setQuality3d(e.target.value as any)}>
+            <div className="flex items-center gap-3">
+              <label htmlFor="qualitySel" className="text-xs text-muted-foreground">품질</label>
+              <select id="qualitySel" className="text-xs rounded border bg-background px-2 py-1" value={quality3d} onChange={e=>setQuality3d(e.target.value as any)}>
                 <option value="fast">빠름</option>
                 <option value="high">선명</option>
               </select>
+              <label htmlFor="maxPoints" className="text-xs text-muted-foreground">점 개수</label>
+              <input id="maxPoints" type="range" min={100} max={2000} step={100} value={maxPoints3d} onChange={(e)=>setMaxPoints3d(parseInt(e.target.value))} aria-valuemin={100} aria-valuemax={2000} aria-valuenow={maxPoints3d} />
+              <div className="text-[11px] text-muted-foreground w-10 text-right" aria-hidden>{maxPoints3d}</div>
               <button className="text-xs underline" onClick={()=>{ setZDeg(angles.z); setXDeg(angles.x); }}>뷰 리셋</button>
             </div>
           </div>
@@ -266,7 +273,7 @@ export default function HistoryPage() {
             lineColor="#64748b"
             lineWidth={1.2}
             quality={quality3d}
-            maxPoints={600}
+            maxPoints={maxPoints3d}
           />
         </Card>
       )}
@@ -291,8 +298,41 @@ export default function HistoryPage() {
                     ))}
                   </div>
                 )}
+                <div className="flex items-center gap-2 pt-1">
+                  <label htmlFor={`tag-${s.id}`} className="text-xs text-muted-foreground">태그 추가</label>
+                  <input
+                    id={`tag-${s.id}`}
+                    className="text-xs rounded border bg-background px-2 py-1 w-28"
+                    placeholder="예: 운동"
+                    value={newTag[s.id] ?? ""}
+                    onChange={(e)=>setNewTag(prev=>({ ...prev, [s.id]: e.target.value }))}
+                    onKeyDown={(e)=>{
+                      if (e.key === "Enter") {
+                        const v = (newTag[s.id] ?? "").trim();
+                        if (!v) return;
+                        const nextTags = Array.from(new Set([...(s.tags || []), v]));
+                        setSessionTags(s.id as any, nextTags as any);
+                        setNewTag(prev=>({ ...prev, [s.id]: "" }));
+                        setSessions(listSessions());
+                      }
+                    }}
+                  />
+                  <Button size="sm" variant="secondary" onClick={()=>{
+                    const v = (newTag[s.id] ?? "").trim();
+                    if (!v) return;
+                    const nextTags = Array.from(new Set([...(s.tags || []), v]));
+                    setSessionTags(s.id as any, nextTags as any);
+                    setNewTag(prev=>({ ...prev, [s.id]: "" }));
+                    setSessions(listSessions());
+                  }}>추가</Button>
+                </div>
               </div>
+              <div className="flex items-center gap-3">
+                <Button size="sm" variant="ghost" aria-pressed={!!s.favorite} onClick={()=>{ toggleFavorite(s.id as any); setSessions(listSessions()); }}>
+                  {s.favorite ? "★ 즐겨찾기 해제" : "☆ 즐겨찾기"}
+                </Button>
               <a className="underline text-xs" href={`/report/${s.id}`}>자세히</a>
+              </div>
             </Card>
           );
         })}
