@@ -12,6 +12,10 @@ export default function HistoryPage() {
   const [range, setRange] = useState<"7"|"30"|"all">("30");
   const [reminder, setReminderState] = useState(()=> getReminder());
   const [quality3d, setQuality3d] = useState<"fast"|"high">("fast");
+  const [onlyFavs, setOnlyFavs] = useState(false);
+  const [tagFilter, setTagFilter] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"newest"|"oldest">("newest");
+  const [cursorT, setCursorT] = useState<number | undefined>(undefined);
   useEffect(() => {
     setMounted(true);
     setSessions(listSessions());
@@ -55,36 +59,45 @@ export default function HistoryPage() {
 
   // Build time series (ascending by createdAt) — hooks must be unconditional
   const filtered = useMemo(()=>{
-    if (range === "all") return sessions;
-    const days = range === "7" ? 7 : 30;
-    const cutoff = Date.now() - days*24*3600*1000;
-    return sessions.filter(s => s.createdAt >= cutoff);
-  }, [sessions, range]);
-  const sorted = useMemo(() => [...filtered].sort((a,b)=>a.createdAt-b.createdAt), [filtered]);
-  const vSeries = useMemo(() => sorted.map(s => ({ t: s.createdAt, v: summarizeSession(s).avgV })), [sorted]);
-  const aSeries = useMemo(() => sorted.map(s => ({ t: s.createdAt, v: summarizeSession(s).avgA })), [sorted]);
-  const dSeries = useMemo(() => sorted.map(s => ({ t: s.createdAt, v: summarizeSession(s).avgD })), [sorted]);
-  const points3D = useMemo(() => sorted.map(s => {
+    let arr = sessions;
+    if (range !== "all") {
+      const days = range === "7" ? 7 : 30;
+      const cutoff = Date.now() - days*24*3600*1000;
+      arr = arr.filter(s => s.createdAt >= cutoff);
+    }
+    if (onlyFavs) arr = arr.filter(s => !!s.favorite);
+    if (tagFilter.trim()) arr = arr.filter(s => (s.tags || []).includes(tagFilter.trim()));
+    return arr;
+  }, [sessions, range, onlyFavs, tagFilter]);
+  const sorted = useMemo(() => {
+    const asc = [...filtered].sort((a,b)=>a.createdAt-b.createdAt);
+    return sortOrder === "oldest" ? asc : asc.reverse();
+  }, [filtered, sortOrder]);
+  const ascForSeries = useMemo(()=>[...sorted].sort((a,b)=>a.createdAt-b.createdAt), [sorted]);
+  const vSeries = useMemo(() => ascForSeries.map(s => ({ t: s.createdAt, v: summarizeSession(s).avgV })), [ascForSeries]);
+  const aSeries = useMemo(() => ascForSeries.map(s => ({ t: s.createdAt, v: summarizeSession(s).avgA })), [ascForSeries]);
+  const dSeries = useMemo(() => ascForSeries.map(s => ({ t: s.createdAt, v: summarizeSession(s).avgD })), [ascForSeries]);
+  const points3D = useMemo(() => ascForSeries.map(s => {
     const avg = summarizeSession(s);
     const clamp01 = (x:number)=> Math.max(0, Math.min(1, x));
     return { x: clamp01(avg.avgV), y: clamp01(avg.avgA), z: clamp01(avg.avgD) };
-  }), [sorted]);
+  }), [ascForSeries]);
 
   const latestAvg = useMemo(() => {
-    const last = sorted[sorted.length-1];
+    const last = ascForSeries[ascForSeries.length-1];
     return last ? summarizeSession(last) : { avgV: 0, avgA: 0, avgD: 0 };
-  }, [sorted]);
+  }, [ascForSeries]);
   const prevAvg = useMemo(() => {
-    const prev = sorted[sorted.length-2];
+    const prev = ascForSeries[ascForSeries.length-2];
     return prev ? summarizeSession(prev) : { avgV: 0, avgA: 0, avgD: 0 };
-  }, [sorted]);
+  }, [ascForSeries]);
   const dv = (latestAvg.avgV - prevAvg.avgV) || 0;
   const da = (latestAvg.avgA - prevAvg.avgA) || 0;
   const dd = (latestAvg.avgD - prevAvg.avgD) || 0;
 
-  const count = sorted.length;
+  const count = ascForSeries.length;
   const rangeText = count
-    ? `${new Date(sorted[0].createdAt).toLocaleDateString()} – ${new Date(sorted[sorted.length-1].createdAt).toLocaleDateString()}`
+    ? `${new Date(ascForSeries[0].createdAt).toLocaleDateString()} – ${new Date(ascForSeries[ascForSeries.length-1].createdAt).toLocaleDateString()}`
     : "";
 
   const angles = useMemo(()=>{
@@ -122,6 +135,16 @@ export default function HistoryPage() {
             <option value="30">30일</option>
             <option value="all">전체</option>
           </select>
+          <label className="text-xs text-muted-foreground">정렬</label>
+          <select className="text-xs rounded border bg-background px-2 py-1" value={sortOrder} onChange={e=>setSortOrder(e.target.value as any)}>
+            <option value="newest">최신순</option>
+            <option value="oldest">오래된순</option>
+          </select>
+          <label className="text-xs text-muted-foreground">태그</label>
+          <input className="text-xs rounded border bg-background px-2 py-1 w-28" placeholder="예: 운동" value={tagFilter} onChange={e=>setTagFilter(e.target.value)} />
+          <label className="text-xs text-muted-foreground flex items-center gap-1">
+            <input type="checkbox" checked={onlyFavs} onChange={e=>setOnlyFavs(e.target.checked)} /> 즐겨찾기만
+          </label>
           <label className="text-xs text-muted-foreground">3D 뷰</label>
           <select className="text-xs rounded border bg-background px-2 py-1" value={view} onChange={e=>setView(e.target.value as any)}>
             <option value="iso">아이소</option>
@@ -177,15 +200,15 @@ export default function HistoryPage() {
           <div className="space-y-2">
             <div>
               <div className="text-xs mb-1">기분(Valence)</div>
-              <LinePlot data={vSeries} color="#10b981" height={180} label="V" yHint="0–1" ariaLabel="Valence trend" />
+              <LinePlot data={vSeries} color="#10b981" height={180} label="V" yHint="0–1" ariaLabel="Valence trend" cursorT={cursorT} onCursorChange={setCursorT} />
             </div>
             <div>
               <div className="text-xs mb-1">에너지(Arousal)</div>
-              <LinePlot data={aSeries} color="#3b82f6" height={180} label="A" yHint="0–1" ariaLabel="Arousal trend" />
+              <LinePlot data={aSeries} color="#3b82f6" height={180} label="A" yHint="0–1" ariaLabel="Arousal trend" cursorT={cursorT} onCursorChange={setCursorT} />
             </div>
             <div>
               <div className="text-xs mb-1">주도성(Dominance)</div>
-              <LinePlot data={dSeries} color="#f59e0b" height={180} label="D" yHint="0–1" ariaLabel="Dominance trend" />
+              <LinePlot data={dSeries} color="#f59e0b" height={180} label="D" yHint="0–1" ariaLabel="Dominance trend" cursorT={cursorT} onCursorChange={setCursorT} />
             </div>
           </div>
         )}

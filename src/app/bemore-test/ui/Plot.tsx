@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 
 type TV = { t: number; v: number };
 
-export function LinePlot({ data, color = "#22c55e", bg = "#0b0b0b", height = 80, label, yHint, cursorT, ariaLabel = "line plot", showGrid = true }: { data: TV[]; color?: string; bg?: string; height?: number; label?: string; yHint?: string; cursorT?: number; ariaLabel?: string; showGrid?: boolean }) {
+export function LinePlot({ data, color = "#22c55e", bg = "#0b0b0b", height = 80, label, yHint, cursorT, ariaLabel = "line plot", showGrid = true, onCursorChange }: { data: TV[]; color?: string; bg?: string; height?: number; label?: string; yHint?: string; cursorT?: number; ariaLabel?: string; showGrid?: boolean; onCursorChange?: (t: number | undefined) => void }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     const cvs = canvasRef.current; if (!cvs) return;
@@ -37,6 +37,23 @@ export function LinePlot({ data, color = "#22c55e", bg = "#0b0b0b", height = 80,
       if (yHint) ctx.fillText(yHint, w-6-ctx.measureText(yHint).width, 14);
     }
   }, [data, color, bg, height, label, yHint, cursorT, showGrid]);
+  useEffect(()=>{
+    const cvs = canvasRef.current; if (!cvs || !onCursorChange) return;
+    const onMove = (e: PointerEvent) => {
+      if (!data || data.length < 2) { onCursorChange(undefined); return; }
+      const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const w = rect.width;
+      const t0 = data[0].t; const t1 = data[data.length-1].t; const dt = Math.max(1, t1 - t0);
+      const clamped = Math.max(0, Math.min(w, x));
+      const t = t0 + (clamped / Math.max(1, w)) * dt;
+      onCursorChange(t);
+    };
+    const onLeave = () => { onCursorChange(undefined); };
+    cvs.addEventListener("pointermove", onMove);
+    cvs.addEventListener("pointerleave", onLeave);
+    return ()=>{ cvs.removeEventListener("pointermove", onMove); cvs.removeEventListener("pointerleave", onLeave); };
+  }, [data, onCursorChange]);
   return <canvas ref={canvasRef} style={{ width: "100%", height }} role="img" aria-label={ariaLabel} />;
 }
 
