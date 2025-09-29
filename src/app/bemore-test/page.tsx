@@ -223,6 +223,11 @@ export default function Page() {
                     <BubbleOverlay text={`${currentTip.insight} — ${currentTip.action}`} />
                   </div>
                 )}
+                {/* Exit & privacy */}
+                <div className="absolute top-2 left-2 z-10 flex items-center gap-2">
+                  <Button size="sm" variant="secondary" className="h-7 rounded-full px-3 py-1" onClick={()=>window.location.assign('/home')}>나가기</Button>
+                  <span className="text-[10px] text-white/80 bg-black/40 rounded px-2 py-0.5">로컬에서만 작동 · 외부 전송 없음</span>
+                </div>
                 {/* Mood chips (bottom-left) */}
                 <div className="absolute bottom-2 left-2 z-10">
                   <MoodChips v={vadNow.v} a={arousal} d={vadNow.d} />

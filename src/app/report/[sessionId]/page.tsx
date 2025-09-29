@@ -59,6 +59,7 @@ export default function ReportPage() {
       <header className="space-y-1">
         <h1 className="text-lg font-semibold">오늘의 리포트</h1>
         <p className="text-sm text-muted-foreground">{mounted ? new Date(sess.createdAt).toLocaleString() : ""}</p>
+        <p className="text-xs text-muted-foreground">이 리포트는 이 브라우저에만 저장되며 외부로 전송되지 않습니다.</p>
       </header>
       <Card className="p-4 space-y-2" aria-labelledby="report-summary-heading">
         <div id="report-summary-heading" className="text-sm">요약</div>

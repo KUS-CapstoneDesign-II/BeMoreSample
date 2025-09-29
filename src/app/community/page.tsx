@@ -18,6 +18,7 @@ export default function CommunityPage() {
       </header>
       <Card className="p-4 text-xs text-muted-foreground">
         익명 규칙 · 존중 · 신고/차단 제공 · 위기시 지역 도움받기 리소스 안내(모크)
+        <br/>모든 글은 이 브라우저에만 로컬로 저장되며 외부로 전송되지 않습니다.
       </Card>
       <div className="grid sm:grid-cols-5 gap-3">
         {topics.map((t)=> (

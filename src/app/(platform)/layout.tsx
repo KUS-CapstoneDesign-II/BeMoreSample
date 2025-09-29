@@ -25,7 +25,10 @@ export default function PlatformLayout({ children }: { children: ReactNode }) {
   }, [router]);
   return (
     <div className="min-h-dvh flex flex-col">
-      <main className="flex-1 pb-16">{children}</main>
+      <main className="flex-1 pb-16">
+        <div className="sr-only" aria-live="polite">이 서비스는 브라우저에서만 로컬로 작동합니다. 데이터는 외부로 전송되지 않습니다.</div>
+        {children}
+      </main>
       <nav aria-label="하단 탭" role="navigation" className="fixed bottom-0 inset-x-0 border-t bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto max-w-4xl grid grid-cols-6">
           {tabs.map((t)=>{
