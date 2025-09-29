@@ -11,6 +11,7 @@ export default function HistoryPage() {
   const [view, setView] = useState<"iso"|"front"|"top"|"side">("iso");
   const [range, setRange] = useState<"7"|"30"|"all">("30");
   const [reminder, setReminderState] = useState(()=> getReminder());
+  const [quality3d, setQuality3d] = useState<"fast"|"high">("fast");
   useEffect(() => {
     setMounted(true);
     setSessions(listSessions());
@@ -94,6 +95,11 @@ export default function HistoryPage() {
       default: return { z: 45, x: 35.264 };
     }
   }, [view]);
+
+  // Interactive 3D angle states (follow preset when view changes)
+  const [zDeg, setZDeg] = useState<number>(45);
+  const [xDeg, setXDeg] = useState<number>(35.264);
+  useEffect(()=>{ setZDeg(angles.z); setXDeg(angles.x); }, [angles.z, angles.x]);
 
   if (!mounted) {
     return (
@@ -214,8 +220,31 @@ export default function HistoryPage() {
 
       {points3D.length > 0 && (
         <Card className="p-4 space-y-2">
-          <div className="text-sm">3D 감정 좌표 (V-A-D)</div>
-          <Scatter3D points={points3D} height={800} ariaLabel="V-A-D 3D view" rotZDeg={angles.z} rotXDeg={angles.x} connect lineColor="#64748b" lineWidth={1.2} quality="fast" maxPoints={600} />
+          <div className="flex items-center justify-between">
+            <div className="text-sm">3D 감정 좌표 (V-A-D)</div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-muted-foreground">품질</label>
+              <select className="text-xs rounded border bg-background px-2 py-1" value={quality3d} onChange={e=>setQuality3d(e.target.value as any)}>
+                <option value="fast">빠름</option>
+                <option value="high">선명</option>
+              </select>
+              <button className="text-xs underline" onClick={()=>{ setZDeg(angles.z); setXDeg(angles.x); }}>뷰 리셋</button>
+            </div>
+          </div>
+          <Scatter3D
+            points={points3D}
+            height={800}
+            ariaLabel="V-A-D 3D view"
+            rotZDeg={zDeg}
+            rotXDeg={xDeg}
+            interactive
+            onAnglesChange={(z,x)=>{ setZDeg(z); setXDeg(x); }}
+            connect
+            lineColor="#64748b"
+            lineWidth={1.2}
+            quality={quality3d}
+            maxPoints={600}
+          />
         </Card>
       )}
 
