@@ -1,5 +1,6 @@
 "use client";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { bumpProgramDay, getProgramProgress } from "@/app/bemore-test/store";
 
 export default function ProgramsPage() {
@@ -20,13 +21,13 @@ export default function ProgramsPage() {
           const total = progress?.totalDays ?? 7;
           const pct = Math.round((day/total)*100);
           return (
-            <Card key={c.id} className="p-4 text-sm space-y-2">
+            <Card key={c.id} className="p-4 text-sm space-y-2 bg-gradient-to-b from-primary/5 to-background">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <div>{c.title}</div>
                   <div className="text-xs text-muted-foreground">하루 {c.minutes}분 · {total}일</div>
                 </div>
-                <button aria-label={`${c.title} ${day>0?"계속하기":"시작하기"}`} className="text-xs underline" onClick={()=>{ bumpProgramDay(c.id, c.title, total); location.reload(); }}>{day>0?"계속하기":"시작"}</button>
+                <Button size="sm" variant="secondary" aria-label={`${c.title} ${day>0?"계속하기":"시작하기"}`} onClick={()=>{ bumpProgramDay(c.id, c.title, total); location.reload(); }}>{day>0?"계속하기":"시작"}</Button>
               </div>
               <div className="flex items-center gap-2">
                 <div className="grow h-2 rounded bg-muted overflow-hidden">

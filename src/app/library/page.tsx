@@ -1,5 +1,6 @@
 "use client";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function LibraryPage() {
   const items = [
@@ -15,9 +16,9 @@ export default function LibraryPage() {
       </header>
       <div className="grid sm:grid-cols-2 gap-3">
         {items.map(i => (
-          <Card key={i.id} className="p-4 text-sm flex items-center justify-between">
+          <Card key={i.id} className="p-4 text-sm flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
             <div>{i.title}</div>
-            <button className="text-xs underline" disabled>읽기(모크)</button>
+            <Button size="sm" variant="ghost" disabled>읽기(모크)</Button>
           </Card>
         ))}
       </div>

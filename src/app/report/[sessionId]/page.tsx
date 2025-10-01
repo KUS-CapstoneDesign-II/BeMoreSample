@@ -61,7 +61,7 @@ export default function ReportPage() {
         <p className="text-sm text-muted-foreground">{mounted ? new Date(sess.createdAt).toLocaleString() : ""}</p>
         <p className="text-xs text-muted-foreground">이 리포트는 이 브라우저에만 저장되며 외부로 전송되지 않습니다.</p>
       </header>
-      <Card className="p-4 space-y-2" aria-labelledby="report-summary-heading">
+      <Card className="p-4 space-y-2 bg-gradient-to-b from-primary/5 to-background" aria-labelledby="report-summary-heading">
         <div id="report-summary-heading" className="text-sm">요약</div>
         <p className="text-xs text-muted-foreground">오늘 마음, 차분한 편이에요</p>
         <dl className="flex gap-2 text-xs">
@@ -79,7 +79,7 @@ export default function ReportPage() {
           </div>
         </dl>
       </Card>
-      <Card className="p-4 space-y-2">
+      <Card className="p-4 space-y-2 bg-gradient-to-b from-secondary/10 to-background">
         <div className="text-sm">하이라이트</div>
         {moments.length === 0 && <div className="text-xs text-muted-foreground">표시할 순간이 없어요.</div>}
         {moments.map((m,i)=> (

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { getDailyStreak, getWeeklyProgress, listSessions, summarizeSession, getProgramProgress } from "@/app/bemore-test/store";
@@ -38,7 +39,7 @@ export default function HomePage() {
         <h1 className="text-lg font-semibold">BeMore</h1>
         <p className="text-sm text-muted-foreground">오늘의 마음을 3분만 살펴보고 가벼워지세요.</p>
       </header>
-      <Card className="p-4 flex items-center justify-between">
+      <Card className="p-4 flex items-center justify-between bg-gradient-to-b from-primary/5 to-background">
         <div className="space-y-1 text-sm">
           <div>연속 {streak.streak}일 기록 {streak.todayHasSession ? "· 오늘 완료" : "· 오늘 미기록"}</div>
           <div className="flex items-center gap-2">
@@ -48,10 +49,12 @@ export default function HomePage() {
             <span className="text-xs text-muted-foreground w-20 text-right">{weekly.completed}/{weekly.target}</span>
           </div>
         </div>
-        <Link href="/bemore-test" aria-label="오늘 기록 시작" className="rounded bg-primary text-primary-foreground px-4 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">오늘 기록하기</Link>
+        <Button asChild>
+          <Link href="/bemore-test" aria-label="오늘 기록 시작">오늘 기록하기</Link>
+        </Button>
       </Card>
       {prog && (
-        <Card className="p-4 flex items-center justify-between">
+        <Card className="p-4 flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
           <div className="space-y-1 text-sm">
             <div>추천 프로그램: 마음챙김 7일</div>
             <div className="flex items-center gap-2">
@@ -61,7 +64,9 @@ export default function HomePage() {
               <span className="text-xs text-muted-foreground">{prog.day}/{prog.total}</span>
             </div>
           </div>
-          <Link href="/programs" className="underline text-xs">{prog.day>0?"계속하기":"시작하기"}</Link>
+          <Button asChild size="sm" variant="secondary">
+            <Link href="/programs">{prog.day>0?"계속하기":"시작하기"}</Link>
+          </Button>
         </Card>
       )}
       <Card className="p-4 space-y-2">
