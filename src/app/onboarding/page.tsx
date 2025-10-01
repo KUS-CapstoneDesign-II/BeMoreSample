@@ -47,7 +47,7 @@ export default function OnboardingPage(){
 
   return (
     <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl p-6 space-y-4">
+      <Card className="w-full max-w-xl p-6 space-y-4 bg-gradient-to-b from-primary/5 to-background">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-semibold">BeMore 시작하기</h1>
@@ -64,7 +64,7 @@ export default function OnboardingPage(){
                 description="표정과 목소리, 그리고 말의 온도를 이해해 더 나은 하루를 돕습니다. 당신의 데이터는 이 브라우저에서만 안전하게 처리돼요."
                 cta={{ label:"다음", onClick:()=>setStep(2) }}
               >
-                <div className="rounded-md p-4 bg-primary/5 text-sm">준비하고 있어요... 잠시 후 가벼운 안내와 권한 요청이 이어집니다.</div>
+                <div className="rounded-md p-4 bg-primary/10 text-sm">준비하고 있어요... 잠시 후 가벼운 안내와 권한 요청이 이어집니다.</div>
               </OnboardingStep>
             </motion.div>
           )}

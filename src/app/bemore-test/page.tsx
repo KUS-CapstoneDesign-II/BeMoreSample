@@ -207,15 +207,15 @@ export default function Page() {
         <div className="grid grid-cols-1 gap-3 justify-items-center">
           {/* Left: Video */}
           <motion.div initial={mounted? {opacity:0, y:6}: false} animate={mounted? {opacity:1, y:0}: undefined} transition={{duration:0.25, delay:0.05}}>
-            <Card className="p-2 space-y-2 bg-gradient-to-b from-primary/5 to-background max-w-4xl w-full mx-auto">
+            <Card className="p-2 space-y-2 bg-gradient-to-b from-primary/10 to-background max-w-4xl w-full mx-auto">
             <div className="text-sm font-medium">Video Area</div>
             <div>
               <div className="relative aspect-video bg-black rounded overflow-hidden">
                 <video ref={videoRef} className="w-full h-full object-cover" muted playsInline aria-label="내 비디오 미리보기" />
-                <div className="absolute top-1 left-1 text-[10px] bg-black/50 text-white px-1 rounded">FPS {fps}</div>
+                <div className="absolute top-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded">FPS {fps}</div>
                 {/* 상단 우측 '자세히' 라운드 버튼 */}
                 <div className="absolute top-2 right-2 z-10">
-                  <Button size="sm" onClick={()=>setDetailsOpen(true)} className="h-7 rounded-full bg-black/50 text-white hover:bg-black/60 backdrop-blur px-3 py-1">자세히</Button>
+                  <Button size="sm" onClick={()=>setDetailsOpen(true)} className="h-7 rounded-full bg-black/60 text-white hover:bg-black/70 backdrop-blur px-3 py-1">자세히</Button>
                 </div>
                 {/* Friendly tip bubble just under details button */}
                 {currentTip && (
@@ -226,12 +226,12 @@ export default function Page() {
                 {/* Exit & privacy */}
                 <div className="absolute top-2 left-2 z-10 flex items-center gap-2">
                   <Button size="sm" variant="secondary" className="h-7 rounded-full px-3 py-1" onClick={()=>window.location.assign('/home')}>나가기</Button>
-                  <span className="text-[10px] text-white/80 bg-black/40 rounded px-2 py-0.5">로컬에서만 작동 · 외부 전송 없음</span>
+                  <span className="text-[10px] text-white/90 bg-black/60 rounded px-2 py-0.5">로컬에서만 작동 · 외부 전송 없음</span>
                 </div>
                 {/* Mood chips (bottom-left) */}
                 <div className="absolute bottom-2 left-2 z-10">
                   <MoodChips v={vadNow.v} a={arousal} d={vadNow.d} />
-                </div>
+              </div>
                 {/* Action bar removed by request */}
               </div>
             </div>
@@ -240,7 +240,7 @@ export default function Page() {
 
           {/* Center column hidden to emphasize video-call UX */}
           {false && (
-            <motion.div initial={{opacity:0, y:6}} animate={{opacity:1, y:0}} transition={{duration:0.25, delay:0.08}}>
+          <motion.div initial={{opacity:0, y:6}} animate={{opacity:1, y:0}} transition={{duration:0.25, delay:0.08}}>
               <Card className="p-2 space-y-2 bg-gradient-to-b from-secondary/10 to-background" />
             </motion.div>
           )}
@@ -262,7 +262,7 @@ export default function Page() {
                   <div>오디오 에너지 {weights.arousalAudio}</div>
                   <div>표정 에너지 {weights.arousalFace}</div>
                   <div>텍스트 주도성 {weights.dominanceText}</div>
-                </div>
+            </div>
               </div>
               <div className="flex justify-end pt-2"><Button size="sm" variant="secondary" onClick={()=>setDetailsOpen(false)}>닫기</Button></div>
             </div>
