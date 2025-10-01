@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
@@ -122,6 +123,24 @@ export default function OnboardingPage(){
           <a className="underline" href="/bemore-test">건너뛰기</a>
         </div>
       </Card>
+      {/* Minimal bottom nav for onboarding (since platform layout doesn't wrap this route) */}
+      <nav aria-label="하단 탭" role="navigation" className="fixed bottom-0 inset-x-0 border-t bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="mx-auto max-w-4xl grid grid-cols-6">
+          {[
+            { href: "/home", label: "홈", icon: "🏠" },
+            { href: "/bemore-test", label: "기록", icon: "🎙️" },
+            { href: "/community", label: "커뮤니티", icon: "🌿" },
+            { href: "/programs", label: "프로그램", icon: "🎯" },
+            { href: "/library", label: "라이브러리", icon: "📚" },
+            { href: "/me", label: "내 정보", icon: "🙂" },
+          ].map(t => (
+            <Link key={t.href} href={t.href} className="flex flex-col items-center justify-center py-2 text-xs text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+              <span aria-hidden className="text-base leading-none">{t.icon}</span>
+              <span className="mt-1">{t.label}</span>
+            </Link>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }
