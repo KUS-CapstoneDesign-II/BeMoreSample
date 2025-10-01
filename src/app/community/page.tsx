@@ -12,12 +12,12 @@ export default function CommunityPage() {
   const [posts, setPosts] = useState(()=> [] as ReturnType<typeof listCommunityPosts>);
   useEffect(()=>{ setPosts(listCommunityPosts(topic)); }, [topic]);
   return (
-    <div className="p-6 space-y-4 max-w-4xl mx-auto">
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
       <header className="space-y-1">
         <h1 className="text-xl font-semibold">커뮤니티</h1>
         <p className="text-sm text-muted-foreground">익명으로 따뜻하게 나누어요. 안전 가이드를 먼저 읽어주세요.</p>
       </header>
-      <Card className="p-4 text-xs text-muted-foreground bg-gradient-to-b from-primary/5 to-background">
+      <Card className="p-6 text-xs text-muted-foreground bg-gradient-to-b from-primary/5 to-background">
         익명 규칙 · 존중 · 신고/차단 제공 · 위기시 지역 도움받기 리소스 안내(모크)
         <br/>모든 글은 이 브라우저에만 로컬로 저장되며 외부로 전송되지 않습니다.
       </Card>
@@ -26,7 +26,7 @@ export default function CommunityPage() {
           <button key={t} onClick={()=>setTopic(t)} className={`rounded border p-2 text-xs ${topic===t?"bg-primary text-primary-foreground":"hover:bg-muted"}`}>#{t}</button>
         ))}
       </div>
-      <Card className="p-4 space-y-2">
+      <Card className="p-6 space-y-3">
         <div className="text-sm">짧은 한 문장 나누기</div>
         <div className="flex gap-2">
           <label className="sr-only" htmlFor="post-input">한 문장 입력</label>
@@ -39,14 +39,14 @@ export default function CommunityPage() {
           }}>올리기</Button>
         </div>
       </Card>
-      <div className="space-y-2">
+      <div className="space-y-3">
         {posts.length===0 && (
           <Card className="p-4 text-xs text-muted-foreground bg-gradient-to-b from-primary/5 to-background">
             아직 글이 없어요. 한 문장이라도 괜찮아요 :)
           </Card>
         )}
         {posts.map(p=> (
-          <Card key={p.id} className="p-3 text-sm flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
+          <Card key={p.id} className="p-6 text-sm flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
             <div className="space-y-1">
               <div className="text-xs text-muted-foreground">#{p.topic} · {new Date(p.createdAt).toLocaleString()}</div>
               <div>{p.text}</div>

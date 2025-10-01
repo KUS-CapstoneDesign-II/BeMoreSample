@@ -9,19 +9,19 @@ export default function ProgramsPage() {
     { id: "sleep-7", title: "부드러운 수면 7일", minutes: 6 },
   ];
   return (
-    <div className="p-6 space-y-4 max-w-4xl mx-auto">
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
       <header className="space-y-1">
         <h1 className="text-xl font-semibold">프로그램</h1>
         <p className="text-sm text-muted-foreground">5~10분 마이크로 과제로 가볍게 시작해요.</p>
       </header>
-      <div className="grid sm:grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-2 gap-4">
         {courses.map(c => {
           const progress = typeof window !== "undefined" ? getProgramProgress(c.id) : undefined;
           const day = progress?.day ?? 0;
           const total = progress?.totalDays ?? 7;
           const pct = Math.round((day/total)*100);
           return (
-            <Card key={c.id} className="p-4 text-sm space-y-2 bg-gradient-to-b from-primary/5 to-background">
+            <Card key={c.id} className="p-6 text-sm space-y-2 bg-gradient-to-b from-primary/5 to-background">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <div>{c.title}</div>

@@ -126,7 +126,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="p-6 space-y-4 max-w-8xl mx-auto">
+    <div className="p-6 space-y-6 max-w-8xl mx-auto">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">종합 분석</h1>
         <div className="flex items-center gap-3">
@@ -158,7 +158,7 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      <Card className="p-4 grid gap-3 md:grid-cols-3 items-center">
+      <Card className="p-6 grid gap-4 md:grid-cols-3 items-center">
         <div className="space-y-1">
           <div className="text-sm">요약</div>
           <div className="text-xs text-muted-foreground">기간 {rangeText} · 세션 {count}회</div>
@@ -187,7 +187,7 @@ export default function HistoryPage() {
         </div>
       </Card>
 
-      <Card className="p-4 space-y-3">
+      <Card className="p-6 space-y-4">
         <div className="text-sm">추세</div>
         {vSeries.length === 0 && (
           <div className="text-xs text-muted-foreground space-y-2">
@@ -246,7 +246,7 @@ export default function HistoryPage() {
       </Card>
 
       {points3D.length > 0 && (
-        <Card className="p-4 space-y-2">
+        <Card className="p-6 space-y-3">
           <div className="flex items-center justify-between">
             <div className="text-sm">3D 감정 좌표 (V-A-D)</div>
             <div className="flex items-center gap-3">

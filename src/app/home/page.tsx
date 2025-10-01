@@ -34,12 +34,12 @@ export default function HomePage() {
   }
 
   return (
-    <div className="p-6 space-y-4 max-w-4xl mx-auto">
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
       <header className="space-y-1">
         <h1 className="text-xl font-semibold">BeMore</h1>
         <p className="text-sm text-muted-foreground">오늘의 마음을 3분만 살펴보고 가벼워지세요.</p>
       </header>
-      <Card className="p-4 flex items-center justify-between bg-gradient-to-b from-primary/5 to-background">
+      <Card className="p-6 flex items-center justify-between bg-gradient-to-b from-primary/5 to-background">
         <div className="space-y-1 text-sm">
           <div>연속 {streak.streak}일 기록 {streak.todayHasSession ? "· 오늘 완료" : "· 오늘 미기록"}</div>
           <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ export default function HomePage() {
         </Button>
       </Card>
       {prog && (
-        <Card className="p-4 flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
+        <Card className="p-6 flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
           <div className="space-y-1 text-sm">
             <div>추천 프로그램: 마음챙김 7일</div>
             <div className="flex items-center gap-2">
@@ -69,7 +69,7 @@ export default function HomePage() {
           </Button>
         </Card>
       )}
-      <Card className="p-4 space-y-2">
+      <Card className="p-6 space-y-3">
         <div className="text-sm">최근 리포트</div>
         {sessions.length === 0 && (
           <div className="text-xs text-muted-foreground">
@@ -91,7 +91,7 @@ export default function HomePage() {
           );
         })}
       </Card>
-      <Card className="p-4 flex items-center justify-between">
+      <Card className="p-6 flex items-center justify-between">
         <div className="text-sm">추천</div>
         <Link href="/programs" className="underline text-xs">마음챙김 1주 코스 살펴보기</Link>
       </Card>

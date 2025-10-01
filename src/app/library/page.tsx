@@ -9,14 +9,14 @@ export default function LibraryPage() {
     { id: "emotion", title: "감정의 3요소: V-A-D", type: "글" },
   ];
   return (
-    <div className="p-6 space-y-4 max-w-4xl mx-auto">
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
       <header className="space-y-1">
         <h1 className="text-xl font-semibold">라이브러리</h1>
         <p className="text-sm text-muted-foreground">짧은 읽을거리와 실습 가이드를 모았어요.</p>
       </header>
-      <div className="grid sm:grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-2 gap-4">
         {items.map(i => (
-          <Card key={i.id} className="p-4 text-sm flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
+          <Card key={i.id} className="p-6 text-sm flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
             <div>{i.title}</div>
             <Button size="sm" variant="ghost" disabled>읽기(모크)</Button>
           </Card>
