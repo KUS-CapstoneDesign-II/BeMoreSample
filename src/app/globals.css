@@ -139,6 +139,15 @@
   }
 }
 
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *:not([data-allow-motion="true"]) {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* BeMore mock styles */
 .badge { @apply inline-block bg-primary/10 text-foreground border border-primary/20 px-1 py-0.5 rounded; }
 @media print {
