@@ -46,22 +46,30 @@ export default function ReportPage() {
   if (!sess) {
     return (
       <div className="p-6 flex items-center justify-center min-h-[60vh]">
-        <Card className="p-6 w-full max-w-md text-center space-y-3">
+        <Card className="p-6 w-full max-w-md text-center space-y-3 bg-gradient-to-b from-secondary/10 to-background">
           <div className="text-sm">리포트를 찾을 수 없어요.</div>
-          <Button onClick={()=>router.replace("/home")}>홈으로</Button>
+          <div className="text-xs text-muted-foreground">너무 걱정하지 마세요. 기록은 이 브라우저에만 저장돼요.</div>
+          <div className="flex items-center justify-center gap-2">
+            <Button variant="secondary" onClick={()=>router.replace("/home")}>
+              홈으로
+            </Button>
+            <Button onClick={()=>router.replace("/bemore-test")}>
+              새 기록 시작
+            </Button>
+          </div>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-4 max-w-4xl mx-auto">
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
       <header className="space-y-1">
-        <h1 className="text-lg font-semibold">오늘의 리포트</h1>
+        <h1 className="text-xl font-semibold">오늘의 리포트</h1>
         <p className="text-sm text-muted-foreground">{mounted ? new Date(sess.createdAt).toLocaleString() : ""}</p>
         <p className="text-xs text-muted-foreground">이 리포트는 이 브라우저에만 저장되며 외부로 전송되지 않습니다.</p>
       </header>
-      <Card className="p-4 space-y-2 bg-gradient-to-b from-primary/5 to-background" aria-labelledby="report-summary-heading">
+      <Card className="p-6 space-y-3 bg-gradient-to-b from-primary/5 to-background" aria-labelledby="report-summary-heading">
         <div id="report-summary-heading" className="text-sm">요약</div>
         <p className="text-xs text-muted-foreground">오늘 마음, 차분한 편이에요</p>
         <dl className="flex gap-2 text-xs">
@@ -79,7 +87,7 @@ export default function ReportPage() {
           </div>
         </dl>
       </Card>
-      <Card className="p-4 space-y-2 bg-gradient-to-b from-secondary/10 to-background">
+      <Card className="p-6 space-y-3 bg-gradient-to-b from-secondary/10 to-background">
         <div className="text-sm">하이라이트</div>
         {moments.length === 0 && <div className="text-xs text-muted-foreground">표시할 순간이 없어요.</div>}
         {moments.map((m,i)=> (
@@ -91,12 +99,12 @@ export default function ReportPage() {
           </div>
         ))}
       </Card>
-      <Card className="p-4 space-y-2">
+      <Card className="p-6 space-y-3">
         <div className="text-sm">따뜻한 제안</div>
         {!tip && <div className="text-xs text-muted-foreground">사용된 제안이 없어요.</div>}
         {tip && <div className="text-sm">{tip.insight} <span className="opacity-70">— {tip.action}</span></div>}
       </Card>
-      <Card className="p-4 space-y-3">
+      <Card className="p-6 space-y-3">
         <div className="flex items-center justify-between">
           <div className="text-sm">개인 메모 · 태그</div>
           <label className="flex items-center gap-2 text-xs">
@@ -144,3 +152,5 @@ export default function ReportPage() {
     </div>
   );
 }
+
+

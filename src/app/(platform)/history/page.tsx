@@ -355,3 +355,5 @@ function displayList(sorted: ReturnType<typeof listSessions>) {
   const others = arr.filter(s => !s.favorite);
   return [...favs, ...others];
 }
+
+

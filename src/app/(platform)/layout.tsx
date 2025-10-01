@@ -34,8 +34,13 @@ export default function PlatformLayout({ children }: { children: ReactNode }) {
           {tabs.map((t)=>{
             const active = pathname === t.href || (t.href !== "/bemore-test" && pathname?.startsWith(t.href));
             return (
-              <Link key={t.href} href={t.href} aria-current={active?"page":undefined} className={`flex flex-col items-center justify-center py-2 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${active ? "text-primary" : "text-muted-foreground"}`}>
-                <span aria-hidden className="text-base leading-none">{t.icon}</span>
+              <Link
+                key={t.href}
+                href={t.href}
+                aria-current={active?"page":undefined}
+                className={`flex flex-col items-center justify-center py-2 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${active ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                <span aria-hidden className={`text-base leading-none ${active?"scale-110":"opacity-80"}`}>{t.icon}</span>
                 <span className="mt-1">{t.label}</span>
               </Link>
             );

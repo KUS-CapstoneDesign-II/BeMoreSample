@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTranscript } from "./useTranscript";
-import { useAudio } from "./useAudio";
-import { useFace } from "./useFace";
-import { LinePlot, Scatter } from "./ui/Plot";
-import { VAD, RingBuffer, fuseVAD, defaultWeights } from "./vad";
-import { bucketVAD, nextTip, getTipsForBucket, type Bucket } from "./cbt";
-import { getOnboarding, setOnboarding, listSessions, upsertSession, summarizeSession, type StoredSession } from "./store";
+import { useTranscript } from "@/app/bemore-test/useTranscript";
+import { useAudio } from "@/app/bemore-test/useAudio";
+import { useFace } from "@/app/bemore-test/useFace";
+import { LinePlot, Scatter } from "@/app/bemore-test/ui/Plot";
+import { VAD, RingBuffer, fuseVAD, defaultWeights } from "@/app/bemore-test/vad";
+import { bucketVAD, nextTip, getTipsForBucket, type Bucket } from "@/app/bemore-test/cbt";
+import { getOnboarding, setOnboarding, listSessions, upsertSession, summarizeSession, type StoredSession } from "@/app/bemore-test/store";
 
 function fmt2(n: number) { return (Math.round(n*100)/100).toFixed(2); }
 function id() { return Math.random().toString(36).slice(2, 10); }
@@ -79,11 +79,9 @@ export default function Page() {
   const vadSeries = useMemo(() => {
     const nowMs = Date.now();
     const arr = vadRB.current.toArray().filter(p=>p.t>=nowMs-windowMs);
-    // reconstruct A/D with current value (for display only); real timeline summarized on save
     return arr.map(p => ({ t: p.t, v: (p.v as number) }));
   }, [vadNow]);
 
-  // Stable tip per bucket (rotate only on user action or bucket change)
   const currentBucket = useMemo<Bucket>(() => {
     const nowMs = Date.now();
     const recent = vadRB.current.toArray().filter(p=>p.t >= (nowMs - 5000));
@@ -100,7 +98,6 @@ export default function Page() {
     }
   }, [currentBucket]);
 
-  // Session actions
   const markMoment = useCallback(() => {
     const t = Date.now(); setBookmarks(prev => [...prev, { t, v: vadNow.v, a: arousal, d: vadNow.d }]);
   }, [vadNow, arousal]);
@@ -121,7 +118,6 @@ export default function Page() {
   const [sessions, setSessions] = useState<StoredSession[]>([]);
   useEffect(()=> { setSessions(listSessions()); }, [mounted]);
 
-  // Derived flags
   const permissionsReady = camPerm !== "pending" && micPerm !== "pending";
   const anyNoise = faceNoise || audioNoise;
 
@@ -153,8 +149,6 @@ export default function Page() {
           }}>상담 종료</Button>
         </div>
       </header>
-
-      {/* 노이즈 모드 상단 알림 비표시 */}
 
       {step < 4 ? (
         <motion.div initial={mounted? {opacity:0, y:6}: false} animate={mounted? {opacity:1, y:0}: undefined} transition={{duration:0.25}}>
@@ -205,7 +199,6 @@ export default function Page() {
 
       {step >= 4 && (
         <div className="grid grid-cols-1 gap-3 justify-items-center">
-          {/* Left: Video */}
           <motion.div initial={mounted? {opacity:0, y:6}: false} animate={mounted? {opacity:1, y:0}: undefined} transition={{duration:0.25, delay:0.05}}>
             <Card className="p-2 space-y-2 bg-gradient-to-b from-primary/10 to-background max-w-4xl w-full mx-auto">
             <div className="text-sm font-medium">Video Area</div>
@@ -213,37 +206,25 @@ export default function Page() {
               <div className="relative aspect-video bg-black rounded overflow-hidden">
                 <video ref={videoRef} className="w-full h-full object-cover" muted playsInline aria-label="내 비디오 미리보기" />
                 <div className="absolute top-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded">FPS {fps}</div>
-                {/* 상단 우측 '자세히' 라운드 버튼 */}
                 <div className="absolute top-2 right-2 z-10">
                   <Button size="sm" onClick={()=>setDetailsOpen(true)} className="h-7 rounded-full bg-black/60 text-white hover:bg-black/70 backdrop-blur px-3 py-1">자세히</Button>
                 </div>
-                {/* Friendly tip bubble just under details button */}
                 {currentTip && (
                   <div className="absolute top-12 right-2 max-w-[60%] z-10">
                     <BubbleOverlay text={`${currentTip.insight} — ${currentTip.action}`} />
                   </div>
                 )}
-                {/* Exit & privacy */}
                 <div className="absolute top-2 left-2 z-10 flex items-center gap-2">
                   <Button size="sm" variant="secondary" className="h-7 rounded-full px-3 py-1" onClick={()=>window.location.assign('/home')}>나가기</Button>
                   <span className="text-[10px] text-white/90 bg-black/60 rounded px-2 py-0.5">로컬에서만 작동 · 외부 전송 없음</span>
                 </div>
-                {/* Mood chips (bottom-left) */}
                 <div className="absolute bottom-2 left-2 z-10">
                   <MoodChips v={vadNow.v} a={arousal} d={vadNow.d} />
-              </div>
-                {/* Action bar removed by request */}
+                </div>
               </div>
             </div>
           </Card>
           </motion.div>
-
-          {/* Center column hidden to emphasize video-call UX */}
-          {false && (
-          <motion.div initial={{opacity:0, y:6}} animate={{opacity:1, y:0}} transition={{duration:0.25, delay:0.08}}>
-              <Card className="p-2 space-y-2 bg-gradient-to-b from-secondary/10 to-background" />
-            </motion.div>
-          )}
           <DetailsSheet open={detailsOpen} onClose={()=>setDetailsOpen(false)}>
             <div className="space-y-2">
               <div className="text-sm font-medium">분석 보기</div>
@@ -262,128 +243,19 @@ export default function Page() {
                   <div>오디오 에너지 {weights.arousalAudio}</div>
                   <div>표정 에너지 {weights.arousalFace}</div>
                   <div>텍스트 주도성 {weights.dominanceText}</div>
-            </div>
+                </div>
               </div>
               <div className="flex justify-end pt-2"><Button size="sm" variant="secondary" onClick={()=>setDetailsOpen(false)}>닫기</Button></div>
             </div>
           </DetailsSheet>
-
-          {/* Right: Chat removed by request */}
         </div>
       )}
-
-      {/* CBT card removed – handled by TipCard above */}
-
-      {/* Session tools, Dashboard, Expert mode removed by request */}
-
-      {/* Footer checklist */}
-      {step >= 4 && (
-        <motion.div initial={{opacity:0, y:6}} animate={{opacity:1, y:0}} transition={{duration:0.25, delay:0.23}}>
-          <Card className="p-3 text-xs grid grid-cols-2 md:grid-cols-5 gap-2">
-          {[
-            "권한 및 온보딩 상태 유지",
-            "영상 오버레이에 표정 지표 표시",
-            "오디오 RMS/Pitch 그래프",
-            "턴 단위 텍스트 분석 동작",
-            "타임라인 커서 가시화",
-            "V/A/D 융합 및 타임라인 업데이트",
-            "현재 상태에 맞는 제안 표시",
-            "북마크/저장(localStorage) 동작",
-            "보고서 인쇄 대화상자",
-            "대시보드 집계 표시",
-          ].map((t,i)=> (
-            <div key={i} className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"/><span>{t}</span></div>
-          ))}
-        </Card>
-        </motion.div>
-      )}
     </div>
   );
 }
 
-function DashboardGrid({ sessions, days }: { sessions: StoredSession[]; days: number }) {
-  const cutoff = Date.now() - days*24*3600*1000;
-  const within = sessions.filter(s => s.createdAt >= cutoff);
-  const byDay = new Map<string, { v:number; a:number; d:number; n:number }>();
-  for (const s of within) {
-    const key = new Date(new Date(s.createdAt).toDateString()).toISOString();
-    const sum = s.vadTimeline.reduce((acc,x)=>({ v: acc.v + x.v, a: acc.a + x.a, d: acc.d + x.d }), { v:0,a:0,d:0 });
-    const n = Math.max(1, s.vadTimeline.length);
-    const avgV = sum.v / n; const avgA = sum.a / n; const avgD = sum.d / n;
-    const prev = byDay.get(key) || { v: 0, a: 0, d: 0, n: 0 };
-    byDay.set(key, { v: prev.v + avgV, a: prev.a + avgA, d: prev.d + avgD, n: prev.n + 1 });
-  }
-  const daysArr = [...byDay.entries()].sort((a,b)=>a[0]<b[0]? -1:1).map(([k,v])=>({ day:k, v:v.v/v.n, a:v.a/v.n, d:v.d/v.n }));
-  return (
-    <div className="grid grid-cols-7 gap-1">
-      {daysArr.map((d,i)=> (
-        <div key={i} className="h-6 rounded" title={`V ${fmt2(d.v)} A ${fmt2(d.a)} D ${fmt2(d.d)}`} style={{ background: `linear-gradient(90deg, rgba(34,197,94,${d.v}), rgba(59,130,246,${d.a}))` }} />
-      ))}
-      {daysArr.length===0 && <div className="text-xs text-muted-foreground">No sessions.</div>}
-    </div>
-  );
-}
-
-// Lightweight, friendly summary card
-function MoodCard({ title, note, v, a, d, spark, cursorT }: { title: string; note: string; v: number; a: number; d: number; spark: { t:number; v:number }[]; cursorT?: number }) {
-  return (
-    <Card className="p-3 space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-medium">지금의 상태</div>
-        <div className="text-xs text-muted-foreground">최근 ~10초</div>
-      </div>
-      <div className="text-base font-semibold">{title}</div>
-      <div className="text-xs text-muted-foreground">{note}</div>
-      <div className="grid grid-cols-3 gap-2 text-xs mt-1">
-        <span className="badge" title="기분(Valence)">V {fmt2(v)}</span>
-        <span className="badge" title="에너지(Arousal)">A {fmt2(a)}</span>
-        <span className="badge" title="주도성(Dominance)">D {fmt2(d)}</span>
-      </div>
-      <div className="mt-2">
-        <LinePlot data={spark} color="#10b981" height={40} yHint="" cursorT={cursorT} ariaLabel="요약 스파크라인" showGrid={false} />
-      </div>
-    </Card>
-  );
-}
-
-// Warm suggestion card
-function TipCard({ insight, action, onRegenerate, onAttach, disabledAttach }: { insight: string; action: string; onRegenerate: ()=>void; onAttach: ()=>void; disabledAttach?: boolean }) {
-  return (
-    <Card className="p-3 space-y-2">
-      <div className="text-sm font-medium">따뜻한 제안</div>
-      <div className="text-sm">{insight} <span className="opacity-70">— {action}</span></div>
-      <div className="flex gap-2">
-        <Button size="sm" onClick={onRegenerate}>다른 제안 보기</Button>
-        <Button size="sm" variant="secondary" disabled={!!disabledAttach} onClick={onAttach}>턴에 연결</Button>
-      </div>
-    </Card>
-  );
-}
-
-// Simple bottom sheet for details
-function DetailsSheet({ open, onClose, children }: { open: boolean; onClose: ()=>void; children: React.ReactNode }) {
-  if (!open) return null;
-  return (
-    <div role="dialog" aria-modal className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="absolute inset-x-0 bottom-0 sm:inset-auto sm:right-4 sm:top-4 sm:w-[520px] sm:bottom-auto bg-background border rounded-t-xl sm:rounded-xl shadow-lg p-4 max-h-[80vh] overflow-auto">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-// Coach pill
-function CoachCapsule({ name }: { name: string }) {
-  return (
-    <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-black/50 text-white text-[11px] backdrop-blur">
-      <span className="inline-block w-4 h-4 rounded-full bg-white/80" />
-      <span>{name}</span>
-    </div>
-  );
-}
-
-// Speech bubble
+function DashboardGrid({ sessions, days }: { sessions: StoredSession[]; days: number }) { return null; }
+function CoachCapsule({ name }: { name: string }) { return null; }
 function BubbleOverlay({ text }: { text: string }) {
   return (
     <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
@@ -393,8 +265,6 @@ function BubbleOverlay({ text }: { text: string }) {
     </motion.div>
   );
 }
-
-// Mood chips (V/A/D)
 function MoodChips({ v, a, d }: { v: number; a: number; d: number }) {
   return (
     <div className="flex items-center gap-1">
@@ -404,3 +274,5 @@ function MoodChips({ v, a, d }: { v: number; a: number; d: number }) {
     </div>
   );
 }
+
+
