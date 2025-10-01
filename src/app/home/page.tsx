@@ -11,6 +11,7 @@ export default function HomePage() {
   const [streak, setStreak] = useState({ streak: 0, todayHasSession: false });
   const [weekly, setWeekly] = useState({ completed: 0, target: 5, ratio: 0 });
   const [prog, setProg] = useState<{ day: number; total: number } | null>(null);
+  const [greet, setGreet] = useState("안녕하세요");
 
   useEffect(() => {
     setMounted(true);
@@ -19,6 +20,8 @@ export default function HomePage() {
     setWeekly(getWeeklyProgress());
     const p = getProgramProgress("mindfulness-7");
     setProg({ day: p?.day ?? 0, total: p?.totalDays ?? 7 });
+    const h = new Date().getHours();
+    setGreet(h < 12 ? "좋은 아침이에요" : h < 18 ? "좋은 오후예요" : "좋은 저녁이에요");
   }, []);
 
   if (!mounted) {
@@ -35,9 +38,20 @@ export default function HomePage() {
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
-      <header className="space-y-1">
-        <h1 className="text-xl font-semibold">BeMore</h1>
-        <p className="text-sm text-muted-foreground">오늘의 마음을 3분만 살펴보고 가벼워지세요.</p>
+      <header className="space-y-3">
+        <div className="rounded-2xl p-6 bg-gradient-to-b from-primary/10 to-background">
+          <div className="text-sm text-muted-foreground">{greet}</div>
+          <h1 className="text-xl font-semibold mt-1">오늘도 가볍게 마음을 살펴볼까요?</h1>
+          <p className="text-sm text-muted-foreground mt-1">3분이면 충분해요. 당신의 데이터는 이 브라우저에만 머물러요.</p>
+          <div className="mt-3 flex gap-2">
+            <Button asChild>
+              <Link href="/bemore-test" aria-label="오늘 기록 시작">바로 기록하기</Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link href="/history">최근 흐름 보기</Link>
+            </Button>
+          </div>
+        </div>
       </header>
       <Card className="p-6 flex items-center justify-between bg-gradient-to-b from-primary/5 to-background">
         <div className="space-y-1 text-sm">
@@ -49,9 +63,14 @@ export default function HomePage() {
             <span className="text-xs text-muted-foreground w-20 text-right">{weekly.completed}/{weekly.target}</span>
           </div>
         </div>
-        <Button asChild>
-          <Link href="/bemore-test" aria-label="오늘 기록 시작">오늘 기록하기</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild>
+            <Link href="/bemore-test" aria-label="오늘 기록 시작">오늘 기록하기</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/programs">가이드</Link>
+          </Button>
+        </div>
       </Card>
       {prog && (
         <Card className="p-6 flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
