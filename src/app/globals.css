@@ -127,6 +127,16 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Brand focus styles for form controls */
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-ring;
+  }
+  button:focus-visible,
+  a:focus-visible {
+    @apply ring-2 ring-ring/40 outline-none;
+  }
 }
 
 /* BeMore mock styles */
