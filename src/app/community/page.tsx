@@ -14,7 +14,7 @@ export default function CommunityPage() {
   return (
     <div className="p-6 space-y-4 max-w-4xl mx-auto">
       <header className="space-y-1">
-        <h1 className="text-lg font-semibold">커뮤니티</h1>
+        <h1 className="text-xl font-semibold">커뮤니티</h1>
         <p className="text-sm text-muted-foreground">익명으로 따뜻하게 나누어요. 안전 가이드를 먼저 읽어주세요.</p>
       </header>
       <Card className="p-4 text-xs text-muted-foreground bg-gradient-to-b from-primary/5 to-background">
@@ -40,7 +40,11 @@ export default function CommunityPage() {
         </div>
       </Card>
       <div className="space-y-2">
-        {posts.length===0 && <Card className="p-4 text-xs text-muted-foreground">아직 글이 없어요. 첫 글을 남겨보세요.</Card>}
+        {posts.length===0 && (
+          <Card className="p-4 text-xs text-muted-foreground bg-gradient-to-b from-primary/5 to-background">
+            아직 글이 없어요. 한 문장이라도 괜찮아요 :)
+          </Card>
+        )}
         {posts.map(p=> (
           <Card key={p.id} className="p-3 text-sm flex items-center justify-between bg-gradient-to-b from-secondary/10 to-background">
             <div className="space-y-1">

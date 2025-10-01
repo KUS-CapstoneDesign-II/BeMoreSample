@@ -8,7 +8,7 @@ export default function MePage() {
   return (
     <div className="p-6 space-y-4 max-w-4xl mx-auto">
       <header className="space-y-1">
-        <h1 className="text-lg font-semibold">내 정보</h1>
+        <h1 className="text-xl font-semibold">내 정보</h1>
         <p className="text-sm text-muted-foreground">익명 프로필과 기본 설정을 관리해요.</p>
       </header>
       <Card className="p-4 text-sm bg-gradient-to-b from-primary/5 to-background">

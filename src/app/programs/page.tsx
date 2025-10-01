@@ -11,7 +11,7 @@ export default function ProgramsPage() {
   return (
     <div className="p-6 space-y-4 max-w-4xl mx-auto">
       <header className="space-y-1">
-        <h1 className="text-lg font-semibold">프로그램</h1>
+        <h1 className="text-xl font-semibold">프로그램</h1>
         <p className="text-sm text-muted-foreground">5~10분 마이크로 과제로 가볍게 시작해요.</p>
       </header>
       <div className="grid sm:grid-cols-2 gap-3">

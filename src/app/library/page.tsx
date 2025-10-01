@@ -11,7 +11,7 @@ export default function LibraryPage() {
   return (
     <div className="p-6 space-y-4 max-w-4xl mx-auto">
       <header className="space-y-1">
-        <h1 className="text-lg font-semibold">라이브러리</h1>
+        <h1 className="text-xl font-semibold">라이브러리</h1>
         <p className="text-sm text-muted-foreground">짧은 읽을거리와 실습 가이드를 모았어요.</p>
       </header>
       <div className="grid sm:grid-cols-2 gap-3">

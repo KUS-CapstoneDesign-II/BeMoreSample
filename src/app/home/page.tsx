@@ -36,7 +36,7 @@ export default function HomePage() {
   return (
     <div className="p-6 space-y-4 max-w-4xl mx-auto">
       <header className="space-y-1">
-        <h1 className="text-lg font-semibold">BeMore</h1>
+        <h1 className="text-xl font-semibold">BeMore</h1>
         <p className="text-sm text-muted-foreground">오늘의 마음을 3분만 살펴보고 가벼워지세요.</p>
       </header>
       <Card className="p-4 flex items-center justify-between bg-gradient-to-b from-primary/5 to-background">
@@ -71,7 +71,14 @@ export default function HomePage() {
       )}
       <Card className="p-4 space-y-2">
         <div className="text-sm">최근 리포트</div>
-        {sessions.length === 0 && <div className="text-xs text-muted-foreground">아직 리포트가 없어요. 오늘 첫 기록을 시작해 보세요.</div>}
+        {sessions.length === 0 && (
+          <div className="text-xs text-muted-foreground">
+            아직 리포트가 없어요. 부담 없이 오늘의 마음을 한 번 기록해 볼까요?
+            <span className="ml-2 inline-block">
+              <Button asChild size="sm" variant="secondary"><Link href="/bemore-test">지금 기록하기</Link></Button>
+            </span>
+          </div>
+        )}
         {sessions.map((s)=>{
           const avg = summarizeSession(s);
           return (
